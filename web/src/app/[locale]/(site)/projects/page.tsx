@@ -5,6 +5,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { Pagination } from "@/components/ui/Pagination";
 import { getProjects } from "@/lib/api";
 import { getDictionary, resolveLocale } from "@/lib/i18n";
+import { pageMetadata } from "@/lib/seo";
 import type { Locale } from "@/lib/i18n";
 
 export async function generateMetadata({
@@ -14,7 +15,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const locale = resolveLocale((await params).locale);
   const dict = getDictionary(locale);
-  return { title: dict.projects.title, description: dict.projects.subtitle };
+  return pageMetadata(
+    locale,
+    "/projects",
+    dict.projects.title,
+    dict.projects.subtitle,
+  );
 }
 
 export default async function ProjectsPage({

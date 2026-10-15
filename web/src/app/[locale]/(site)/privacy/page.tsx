@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { PageHero } from "@/components/layout/PageHero";
 import { getDictionary, resolveLocale } from "@/lib/i18n";
+import { pageMetadata } from "@/lib/seo";
 import { SITE } from "@/lib/site";
 
 const SECTION_KEYS = ["intro", "collect", "use", "cookies", "contact"] as const;
@@ -12,7 +13,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const locale = resolveLocale((await params).locale);
   const dict = getDictionary(locale);
-  return { title: dict.privacy.title, description: dict.privacy.subtitle };
+  return pageMetadata(locale, "/privacy", dict.privacy.title, dict.privacy.subtitle);
 }
 
 export default async function PrivacyPage({

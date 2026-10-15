@@ -4,6 +4,7 @@ import { PageHero } from "@/components/layout/PageHero";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { getTestimonials } from "@/lib/api";
 import { getDictionary, resolveLocale } from "@/lib/i18n";
+import { pageMetadata } from "@/lib/seo";
 import type { Locale } from "@/lib/i18n";
 
 export async function generateMetadata({
@@ -13,7 +14,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const locale = resolveLocale((await params).locale);
   const dict = getDictionary(locale);
-  return { title: dict.testimonials.title, description: dict.testimonials.subtitle };
+  return pageMetadata(
+    locale,
+    "/testimonials",
+    dict.testimonials.title,
+    dict.testimonials.subtitle,
+  );
 }
 
 export default async function TestimonialsPage({

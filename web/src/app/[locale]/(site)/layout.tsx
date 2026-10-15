@@ -1,6 +1,7 @@
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
+import { GoogleAnalytics } from "@/components/seo/GoogleAnalytics";
 import { getPublicSettings, getServices } from "@/lib/api";
 import { env } from "@/lib/env";
 import { getDictionary, resolveLocale } from "@/lib/i18n";
@@ -44,6 +45,7 @@ export default async function SiteLayout({
       </main>
       <Footer locale={locale} dict={dict} settings={settings} services={services.items} />
       <WhatsAppButton settings={settings} label={dict.common.chatOnWhatsApp} />
+      <GoogleAnalytics />
     </div>
   );
 }

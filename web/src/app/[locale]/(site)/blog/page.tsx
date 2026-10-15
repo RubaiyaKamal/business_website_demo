@@ -6,6 +6,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { Pagination } from "@/components/ui/Pagination";
 import { getPostCategories, getPosts } from "@/lib/api";
 import { getDictionary, resolveLocale } from "@/lib/i18n";
+import { pageMetadata } from "@/lib/seo";
 import type { Locale } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
@@ -16,7 +17,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const locale = resolveLocale((await params).locale);
   const dict = getDictionary(locale);
-  return { title: dict.blog.title, description: dict.blog.subtitle };
+  return pageMetadata(locale, "/blog", dict.blog.title, dict.blog.subtitle);
 }
 
 export default async function BlogPage({

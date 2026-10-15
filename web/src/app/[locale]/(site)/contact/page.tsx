@@ -5,6 +5,7 @@ import { Icon } from "@/components/ui/Icon";
 import { getPublicSettings, getServices } from "@/lib/api";
 import { whatsappLink } from "@/lib/env";
 import { getDictionary, resolveLocale } from "@/lib/i18n";
+import { pageMetadata } from "@/lib/seo";
 import { SITE } from "@/lib/site";
 
 export async function generateMetadata({
@@ -14,7 +15,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const locale = resolveLocale((await params).locale);
   const dict = getDictionary(locale);
-  return { title: dict.contact.title, description: dict.contact.subtitle };
+  return pageMetadata(locale, "/contact", dict.contact.title, dict.contact.subtitle);
 }
 
 export default async function ContactPage({

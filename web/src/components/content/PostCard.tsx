@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Icon } from "@/components/ui/Icon";
 import type { Locale } from "@/lib/i18n";
@@ -18,11 +19,12 @@ export function PostCard({ locale, post, minReadLabel }: PostCardProps) {
       <Link href={`/${locale}/blog/${post.slug}`} className="block">
         <div className="relative flex h-44 items-center justify-center bg-gradient-to-br from-primary-50 to-slate-100">
           {post.cover_image_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <Image
               src={post.cover_image_url}
               alt={localized(locale, post.title, post.title_ur)}
-              className="h-full w-full object-cover"
+              fill
+              sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+              className="object-cover"
             />
           ) : (
             <Icon name="sparkles" size={36} className="text-primary/40" />

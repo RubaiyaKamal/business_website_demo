@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Icon } from "@/components/ui/Icon";
 import type { Locale } from "@/lib/i18n";
@@ -22,11 +23,12 @@ export function ProjectCard({
       <Link href={`/${locale}/projects/${project.slug}`} className="block">
         <div className="relative flex h-52 items-center justify-center bg-gradient-to-br from-primary-50 to-slate-100">
           {project.image_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <Image
               src={project.image_url}
               alt={localized(locale, project.title, project.title_ur)}
-              className="h-full w-full object-cover"
+              fill
+              sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+              className="object-cover"
             />
           ) : (
             <Icon name="image" size={40} className="text-primary/40" />

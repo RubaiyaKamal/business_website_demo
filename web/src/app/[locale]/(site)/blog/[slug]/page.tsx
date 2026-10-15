@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PostCard } from "@/components/content/PostCard";
 import { RichText } from "@/components/content/RichText";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { Icon } from "@/components/ui/Icon";
 import { getPost, getPosts, getRelatedPosts } from "@/lib/api";
 import { env } from "@/lib/env";
 import { getDictionary, locales, resolveLocale } from "@/lib/i18n";
 import type { Locale } from "@/lib/i18n";
+import { alternatesFor, blogPostingJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 import { absoluteUrl, formatDate, localized, truncate } from "@/lib/utils";
 
 export async function generateStaticParams() {
@@ -36,7 +39,7 @@ export async function generateMetadata({
   return {
     title,
     description,
-    alternates: { canonical },
+    alternates: alternatesFor(locale, `/blog/${slug}`),
     openGraph: {
       type: "article",
       title,
@@ -45,6 +48,7 @@ export async function generateMetadata({
       images: post.cover_image_url ? [{ url: post.cover_image_url }] : undefined,
       publishedTime: post.published_at ?? undefined,
     },
+    twitter: { card: "summary_large_image", title, description },
   };
 }
 
@@ -66,6 +70,13 @@ export default async function BlogPostPage({
 
   return (
     <>
+      <JsonLd data={blogPostingJsonLd(post, locale)} />
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: dict.nav.blog, url: absoluteUrl(`/${locale}/blog`, env.siteUrl) },
+          { name: title, url: canonical },
+        ])}
+      />
       <article className="container-page max-w-3xl py-14">
         <Link
           href={`/${locale}/blog`}
@@ -98,10 +109,12 @@ export default async function BlogPostPage({
         </div>
 
         {post.cover_image_url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Image
             src={post.cover_image_url}
             alt={title}
+            width={1200}
+            height={675}
+            sizes="(min-width: 768px) 768px, 100vw"
             className="mt-8 aspect-video w-full rounded-2xl object-cover shadow-card"
           />
         ) : null}

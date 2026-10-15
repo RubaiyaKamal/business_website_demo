@@ -1,12 +1,20 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { PostCard } from "@/components/content/PostCard";
 import { ProjectCard } from "@/components/content/ProjectCard";
 import { ServiceCard } from "@/components/content/ServiceCard";
 import { TestimonialCard } from "@/components/content/TestimonialCard";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { getPosts, getProjects, getServices, getTestimonials } from "@/lib/api";
+import { getPosts, getProjects, getPublicSettings, getServices, getTestimonials } from "@/lib/api";
 import { getDictionary, resolveLocale } from "@/lib/i18n";
+import {
+  alternatesFor,
+  localBusinessJsonLd,
+  organizationJsonLd,
+  websiteJsonLd,
+} from "@/lib/seo";
 import { SITE } from "@/lib/site";
 
 const WHY_FEATURES: { key: string; icon: IconName }[] = [
@@ -25,19 +33,32 @@ const STATS = [
   { key: "reviews", value: "4.9/5" },
 ] as const;
 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const locale = resolveLocale((await params).locale);
+  return { alternates: alternatesFor(locale, "") };
+}
+
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const locale = resolveLocale((await params).locale);
   const dict = getDictionary(locale);
 
-  const [services, projects, testimonials, posts] = await Promise.all([
+  const [services, projects, testimonials, posts, settings] = await Promise.all([
     getServices(1, 6),
     getProjects(1, 3),
     getTestimonials(),
     getPosts(1, undefined, 3),
+    getPublicSettings(),
   ]);
 
   return (
     <>
+      <JsonLd data={organizationJsonLd(settings)} />
+      <JsonLd data={localBusinessJsonLd(settings)} />
+      <JsonLd data={websiteJsonLd()} />
       <section className="relative overflow-hidden bg-dark text-white">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(30,142,62,0.45),transparent_55%)]" />
         <div className="container-page relative grid items-center gap-12 py-20 lg:grid-cols-2 lg:py-28">

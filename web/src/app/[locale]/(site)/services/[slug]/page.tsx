@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { RichText } from "@/components/content/RichText";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { Icon, type IconName } from "@/components/ui/Icon";
-import { getService, getServices } from "@/lib/api";
+import { getPublicSettings, getService, getServices } from "@/lib/api";
 import { env, whatsappLink } from "@/lib/env";
 import { getDictionary, locales, resolveLocale } from "@/lib/i18n";
 import type { Locale } from "@/lib/i18n";
+import { alternatesFor, absoluteMedia, breadcrumbJsonLd, serviceJsonLd } from "@/lib/seo";
 import { absoluteUrl, formatPrice, localized, truncate } from "@/lib/utils";
 
 const KNOWN_ICONS: IconName[] = [
@@ -44,7 +46,15 @@ export async function generateMetadata({
   return {
     title,
     description,
-    alternates: { canonical: absoluteUrl(`/${locale}/services/${slug}`, env.siteUrl) },
+    alternates: alternatesFor(locale, `/services/${slug}`),
+    openGraph: {
+      type: "website",
+      title,
+      description,
+      url: absoluteUrl(`/${locale}/services/${slug}`, env.siteUrl),
+      images: service.image_url ? [absoluteMedia(service.image_url)] : undefined,
+    },
+    twitter: { card: "summary_large_image", title, description },
   };
 }
 
@@ -61,6 +71,7 @@ export default async function ServiceDetailPage({
 
   const all = await getServices(1, 100);
   const others = all.items.filter((item) => item.slug !== slug).slice(0, 3);
+  const provider = await getPublicSettings();
   const icon: IconName =
     service.icon && (KNOWN_ICONS as string[]).includes(service.icon)
       ? (service.icon as IconName)
@@ -68,6 +79,18 @@ export default async function ServiceDetailPage({
 
   return (
     <>
+      <JsonLd
+        data={serviceJsonLd(service, locale, provider ?? null)}
+      />
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: dict.nav.services, url: absoluteUrl(`/${locale}/services`, env.siteUrl) },
+          {
+            name: localized(locale, service.title, service.title_ur),
+            url: absoluteUrl(`/${locale}/services/${slug}`, env.siteUrl),
+          },
+        ])}
+      />
       <section className="border-b border-slate-200 bg-white">
         <div className="container-page grid gap-10 py-14 lg:grid-cols-[1.5fr_1fr] lg:py-20">
           <div>

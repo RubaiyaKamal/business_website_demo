@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { RichText } from "@/components/content/RichText";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { Icon } from "@/components/ui/Icon";
 import { getProject, getProjects } from "@/lib/api";
 import { env } from "@/lib/env";
 import { getDictionary, locales, resolveLocale } from "@/lib/i18n";
 import type { Locale } from "@/lib/i18n";
+import { alternatesFor, absoluteMedia, breadcrumbJsonLd, projectJsonLd } from "@/lib/seo";
 import { absoluteUrl, formatDate, localized, truncate } from "@/lib/utils";
 
 export async function generateStaticParams() {
@@ -29,10 +32,20 @@ export async function generateMetadata({
   const locale = resolveLocale(rawLocale);
   const project = await getProject(slug);
   if (!project) return {};
+  const title = localized(locale, project.title, project.title_ur);
+  const description = truncate(localized(locale, project.summary, project.summary_ur));
   return {
-    title: localized(locale, project.title, project.title_ur),
-    description: truncate(localized(locale, project.summary, project.summary_ur)),
-    alternates: { canonical: absoluteUrl(`/${locale}/projects/${slug}`, env.siteUrl) },
+    title,
+    description,
+    alternates: alternatesFor(locale, `/projects/${slug}`),
+    openGraph: {
+      type: "website",
+      title,
+      description,
+      url: absoluteUrl(`/${locale}/projects/${slug}`, env.siteUrl),
+      images: project.image_url ? [absoluteMedia(project.image_url)] : undefined,
+    },
+    twitter: { card: "summary_large_image", title, description },
   };
 }
 
@@ -53,6 +66,13 @@ export default async function ProjectDetailPage({
 
   return (
     <>
+      <JsonLd data={projectJsonLd(project, locale)} />
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: dict.nav.projects, url: absoluteUrl(`/${locale}/projects`, env.siteUrl) },
+          { name: title, url: absoluteUrl(`/${locale}/projects/${slug}`, env.siteUrl) },
+        ])}
+      />
       <section className="border-b border-slate-200 bg-white">
         <div className="container-page py-14 lg:py-20">
           <nav className="mb-6 flex items-center gap-2 text-sm text-slate-500">
@@ -93,10 +113,12 @@ export default async function ProjectDetailPage({
           </div>
 
           {project.image_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <Image
               src={project.image_url}
               alt={title}
+              width={800}
+              height={600}
+              sizes="(min-width: 1024px) 40vw, 100vw"
               className="card h-fit w-full object-cover"
             />
           ) : null}
@@ -107,11 +129,13 @@ export default async function ProjectDetailPage({
             <h2 className="text-2xl">{dict.projects.gallery}</h2>
             <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {project.gallery.map((url, index) => (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
+                <Image
                   key={`${url}-${index}`}
                   src={url}
                   alt={`${title} ${index + 1}`}
+                  width={600}
+                  height={400}
+                  sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                   className="h-56 w-full rounded-2xl object-cover shadow-card"
                 />
               ))}

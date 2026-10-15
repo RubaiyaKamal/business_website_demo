@@ -1,7 +1,9 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { PageHero } from "@/components/layout/PageHero";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { getDictionary, resolveLocale } from "@/lib/i18n";
+import { pageMetadata } from "@/lib/seo";
 import { SITE } from "@/lib/site";
 
 const VALUES: { key: string; icon: IconName }[] = [
@@ -9,6 +11,16 @@ const VALUES: { key: string; icon: IconName }[] = [
   { key: "care", icon: "user" },
   { key: "speed", icon: "bolt" },
 ];
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const locale = resolveLocale((await params).locale);
+  const dict = getDictionary(locale);
+  return pageMetadata(locale, "/about", dict.about.title, dict.about.subtitle);
+}
 
 export default async function AboutPage({ params }: { params: Promise<{ locale: string }> }) {
   const locale = resolveLocale((await params).locale);

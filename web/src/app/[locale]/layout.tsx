@@ -60,6 +60,11 @@ export async function generateMetadata({ params }: LayoutProps): Promise<Metadat
       siteName: SITE.name,
       locale: locale === "ur" ? "ur_PK" : "en_PK",
     },
+    twitter: {
+      card: "summary_large_image",
+      title: `${SITE.name} — ${dict.meta.tagline}`,
+      description: dict.meta.defaultDescription,
+    },
   };
 }
 
