@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { cn, readingTime, slugify, truncate } from "@/lib/utils";
+import { cn, formatPrice, localized, readingTime, slugify, truncate } from "@/lib/utils";
 
 describe("cn", () => {
   it("merges class names and resolves Tailwind conflicts", () => {
@@ -35,5 +35,27 @@ describe("truncate", () => {
 
   it("leaves short text untouched", () => {
     expect(truncate("short", 20)).toBe("short");
+  });
+});
+
+describe("localized", () => {
+  it("prefers the Urdu value only for the ur locale", () => {
+    expect(localized("en", "Hello", "ہیلو")).toBe("Hello");
+    expect(localized("ur", "Hello", "ہیلو")).toBe("ہیلو");
+  });
+
+  it("falls back to English when the Urdu value is missing", () => {
+    expect(localized("ur", "Hello", null)).toBe("Hello");
+  });
+});
+
+describe("formatPrice", () => {
+  it("formats numbers as PKR", () => {
+    expect(formatPrice(1500)).toContain("1,500");
+  });
+
+  it("returns an empty string for missing values", () => {
+    expect(formatPrice(null)).toBe("");
+    expect(formatPrice(undefined)).toBe("");
   });
 });

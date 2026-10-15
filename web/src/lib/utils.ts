@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import type { Locale } from "@/lib/i18n";
 
 /** Merge conditional class names, de-duplicating conflicting Tailwind classes. */
 export function cn(...inputs: ClassValue[]): string {
@@ -54,4 +55,19 @@ export function absoluteUrl(path: string, base?: string): string {
     "",
   );
   return `${root}${path.startsWith("/") ? path : `/${path}`}`;
+}
+
+/** Pick the Urdu translation for the `ur` locale, falling back to English. */
+export function localized(locale: Locale, en: string, ur?: string | null): string {
+  return locale === "ur" && ur ? ur : en;
+}
+
+/** Format a numeric price as Pakistani Rupees, locale-aware. */
+export function formatPrice(value: number | null | undefined, locale: Locale = "en"): string {
+  if (value === null || value === undefined) return "";
+  return new Intl.NumberFormat(locale === "ur" ? "ur-PK" : "en-PK", {
+    style: "currency",
+    currency: "PKR",
+    maximumFractionDigits: 0,
+  }).format(value);
 }
