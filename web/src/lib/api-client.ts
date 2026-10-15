@@ -1,5 +1,7 @@
 import { env } from "@/lib/env";
 import type {
+  AiDraftResult,
+  AiMode,
   AuthResponse,
   DashboardStats,
   InquiryCreate,
@@ -219,4 +221,13 @@ export async function uploadImage(file: File): Promise<UploadResult> {
     throw new ApiError(extractDetail(body, "Upload failed"), res.status);
   }
   return body as UploadResult;
+}
+
+// --- Admin: AI helper (flagged off on the API until ENABLE_AI=true) --------
+
+export function aiDraft(mode: AiMode, title: string, context: string): Promise<AiDraftResult> {
+  return request<AiDraftResult>("/admin/ai/draft", {
+    method: "POST",
+    body: JSON.stringify({ mode, title, context: context || null }),
+  });
 }

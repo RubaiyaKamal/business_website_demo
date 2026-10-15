@@ -163,3 +163,10 @@ export type UploadResult = {
 };
 
 export type ResourceRecord = Record<string, unknown> & { id: number };
+
+export type AiMode = "draft" | "meta";
+
+export type AiDraftResult = {
+  text: string;
+  mode: AiMode;
+};

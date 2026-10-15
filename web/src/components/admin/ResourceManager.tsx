@@ -5,12 +5,14 @@ import { useCallback, useEffect, useState } from "react";
 import { Icon } from "@/components/ui/Icon";
 import { ImageField } from "@/components/admin/ImageField";
 import {
+  aiDraft,
   createResource,
   deleteResource,
   listResource,
   setPublished,
   updateResource,
 } from "@/lib/api-client";
+import { env } from "@/lib/env";
 import {
   allFields,
   buildPayload,
@@ -20,7 +22,7 @@ import {
   type ResourceDef,
 } from "@/lib/admin";
 import { formatDate } from "@/lib/utils";
-import type { ResourceRecord } from "@/lib/types";
+import type { AiMode, ResourceRecord } from "@/lib/types";
 
 const PAGE_SIZE = 10;
 
@@ -44,6 +46,9 @@ export function ResourceManager({ resource, labels }: Props) {
   const [values, setValues] = useState<Record<string, unknown>>({});
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [aiBusy, setAiBusy] = useState<AiMode | null>(null);
+
+  const showAi = env.enableAi && resource.endpoint === "/admin/blog";
 
   const load = useCallback(
     async (target: number) => {
@@ -89,6 +94,26 @@ export function ResourceManager({ resource, labels }: Props) {
 
   function setField(name: string, value: unknown) {
     setValues((prev) => ({ ...prev, [name]: value }));
+  }
+
+  async function runAi(mode: AiMode) {
+    const title = String(values.title ?? "").trim();
+    if (!title) {
+      setFormError(labels.aiNeedsTitle);
+      return;
+    }
+    setFormError(null);
+    setAiBusy(mode);
+    try {
+      const target = mode === "draft" ? "body" : "excerpt";
+      const context = String(mode === "draft" ? (values.excerpt ?? "") : (values.body ?? ""));
+      const result = await aiDraft(mode, title, context);
+      setField(target, result.text);
+    } catch (err) {
+      setFormError(err instanceof Error ? err.message : labels.error);
+    } finally {
+      setAiBusy(null);
+    }
   }
 
   async function submit(event: React.FormEvent) {
@@ -307,6 +332,28 @@ export function ResourceManager({ resource, labels }: Props) {
                 <Icon name="x" size={20} />
               </button>
             </div>
+
+            {showAi && (
+              <div className="mx-6 mt-5 flex flex-wrap items-center gap-2 rounded-xl border border-dashed border-primary/40 bg-primary/5 px-3 py-2.5">
+                <span className="text-sm font-semibold text-primary">{labels.aiHelper}</span>
+                <button
+                  type="button"
+                  onClick={() => void runAi("draft")}
+                  disabled={aiBusy !== null}
+                  className="rounded-lg border border-black/10 bg-white px-3 py-1.5 text-xs font-semibold text-ink transition hover:border-primary hover:text-primary disabled:opacity-50"
+                >
+                  {aiBusy === "draft" ? labels.aiWorking : labels.aiDraft}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void runAi("meta")}
+                  disabled={aiBusy !== null}
+                  className="rounded-lg border border-black/10 bg-white px-3 py-1.5 text-xs font-semibold text-ink transition hover:border-primary hover:text-primary disabled:opacity-50"
+                >
+                  {aiBusy === "meta" ? labels.aiWorking : labels.aiMeta}
+                </button>
+              </div>
+            )}
 
             <div className="grid grid-cols-1 gap-4 px-6 py-5 sm:grid-cols-2">
               {fields.map((field) => (

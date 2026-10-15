@@ -61,6 +61,12 @@ export type AdminLabels = {
   uploading: string;
   removeImage: string;
   imageUrlPlaceholder: string;
+  // AI assistant (blog editor)
+  aiHelper: string;
+  aiDraft: string;
+  aiMeta: string;
+  aiWorking: string;
+  aiNeedsTitle: string;
   // inquiries
   markRead: string;
   markReplied: string;
@@ -126,6 +132,11 @@ const EN: AdminLabels = {
   uploading: "Uploading…",
   removeImage: "Remove",
   imageUrlPlaceholder: "https://… or /media/…",
+  aiHelper: "AI assistant",
+  aiDraft: "Draft with AI",
+  aiMeta: "Suggest meta description",
+  aiWorking: "Thinking…",
+  aiNeedsTitle: "Add a title first, then ask the AI assistant.",
   markRead: "Mark read",
   markReplied: "Mark replied",
   email: "Email",
@@ -168,6 +179,11 @@ const UR: AdminLabels = {
   welcome: "خوش آمدید",
   settingsSaved: "ترتیبات محفوظ ہو گئیں۔",
   saveSettings: "ترتیبات محفوظ کریں",
+  aiHelper: "AI اسسٹنٹ",
+  aiDraft: "AI سے ڈرافٹ بنائیں",
+  aiMeta: "میٹا تفصیل تجویز کریں",
+  aiWorking: "سوچ رہا ہے…",
+  aiNeedsTitle: "پہلے عنوان درج کریں، پھر AI اسسٹنٹ استعمال کریں۔",
 };
 
 const LABELS: Record<"en" | "ur", AdminLabels> = { en: EN, ur: UR };

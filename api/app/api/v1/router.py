@@ -5,6 +5,7 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, Request
 
 from app.api.v1.endpoints import (
+    ai,
     auth,
     blog,
     dashboard,
@@ -52,3 +53,4 @@ api_router.include_router(testimonials.admin_router, dependencies=_ADMIN_DEPS)
 api_router.include_router(inquiries.admin_router, dependencies=_ADMIN_DEPS)
 api_router.include_router(settings.admin_router, dependencies=_ADMIN_DEPS)
 api_router.include_router(uploads.router, dependencies=_ADMIN_DEPS)
+api_router.include_router(ai.router, dependencies=_ADMIN_DEPS)

@@ -14,6 +14,7 @@ export const env = {
   instagramUrl: process.env.NEXT_PUBLIC_INSTAGRAM_URL ?? "https://instagram.com/greenvolt",
   tiktokUrl: process.env.NEXT_PUBLIC_TIKTOK_URL ?? "https://tiktok.com/@greenvolt",
   enableUserAuth: process.env.NEXT_PUBLIC_ENABLE_USER_AUTH === "true",
+  enableAi: process.env.NEXT_PUBLIC_ENABLE_AI === "true",
 } as const;
 
 /** Build a wa.me link with an optional pre-filled message. */
