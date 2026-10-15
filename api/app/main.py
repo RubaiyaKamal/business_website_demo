@@ -7,13 +7,22 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
 
 from app import __version__
 from app.api.v1.router import api_router
 from app.core.config import settings
+from app.core.middleware import SecurityHeadersMiddleware
+from app.core.rate_limit import limiter
+
+_ALLOWED_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
+_ALLOWED_HEADERS = ["Content-Type", "Accept", "Authorization", settings.csrf_header_name]
 
 
 def create_app() -> FastAPI:
+    settings.enforce_production_secrets()
+
     app = FastAPI(
         title=settings.project_name,
         version=__version__,
@@ -22,12 +31,18 @@ def create_app() -> FastAPI:
         openapi_url="/openapi.json" if not settings.is_production else None,
     )
 
+    app.state.limiter = limiter
+    # slowapi's handler is typed for its own exception subclass; Starlette accepts it.
+    app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)  # type: ignore[arg-type]
+
+    app.add_middleware(SecurityHeadersMiddleware)
+
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,
         allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
+        allow_methods=_ALLOWED_METHODS,
+        allow_headers=_ALLOWED_HEADERS,
     )
 
     @app.get("/health", tags=["ops"])

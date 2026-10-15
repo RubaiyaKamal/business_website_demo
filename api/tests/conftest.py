@@ -19,6 +19,14 @@ ADMIN_EMAIL = "admin@greenvolt.com"
 ADMIN_PASSWORD = "AdminPass123!"
 
 
+@pytest.fixture(autouse=True)
+def _disable_rate_limit(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Keep the shared limiter out of the way unless a test opts back in."""
+    from app.core.rate_limit import limiter
+
+    monkeypatch.setattr(limiter, "enabled", False)
+
+
 @pytest.fixture()
 def engine() -> Iterator[object]:
     """A fresh in-memory SQLite database shared across connections."""
@@ -68,4 +76,8 @@ def admin_client(client: TestClient, db_session: Session) -> TestClient:
         json={"email": ADMIN_EMAIL, "password": ADMIN_PASSWORD},
     )
     assert response.status_code == 200, response.text
+    # Logging in also issues the CSRF cookie; echo it on later admin writes.
+    csrf_token = client.cookies.get("gv_csrf")
+    assert csrf_token, "login should set a CSRF cookie"
+    client.headers["x-csrf-token"] = csrf_token
     return client

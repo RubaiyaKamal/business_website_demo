@@ -1,13 +1,17 @@
-"""Contact / enquiry endpoints (public submit + admin inbox)."""
+"""Contact / enquiry endpoints (public submit + admin inbox).
 
-from __future__ import annotations
+Note: this module intentionally omits ``from __future__ import annotations`` so
+FastAPI can resolve the request body models through slowapi's wrapper.
+"""
 
 from typing import Annotated
 
 from fastapi import APIRouter, BackgroundTasks, HTTPException, Query, Request, Response, status
 
 from app.api.v1.utils import PageDep, total_pages
+from app.core.config import settings
 from app.core.deps import AdminUser, DbSession, get_client_ip
+from app.core.rate_limit import limiter
 from app.crud.inquiry import inquiry_crud
 from app.crud.service import service_crud
 from app.models.inquiry import INQUIRY_STATUSES, ContactMessage
@@ -35,9 +39,10 @@ def _get_or_404(db: DbSession, inquiry_id: int) -> ContactMessage:
 
 
 @public_router.post("", response_model=InquiryCreated, status_code=status.HTTP_201_CREATED)
+@limiter.limit(settings.contact_rate_limit)
 def submit_inquiry(
-    payload: InquiryCreate,
     request: Request,
+    payload: InquiryCreate,
     db: DbSession,
     background: BackgroundTasks,
 ) -> InquiryCreated:

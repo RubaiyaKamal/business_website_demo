@@ -1,11 +1,15 @@
-"""Authentication endpoints (JWT stored in an httpOnly cookie)."""
+"""Authentication endpoints (JWT stored in an httpOnly cookie).
 
-from __future__ import annotations
+Note: this module intentionally omits ``from __future__ import annotations`` so
+FastAPI can resolve the request body models through slowapi's wrapper.
+"""
 
-from fastapi import APIRouter, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 
 from app.core.config import settings
+from app.core.csrf import require_csrf
 from app.core.deps import CurrentUser, DbSession, clear_auth_cookie, set_auth_cookie
+from app.core.rate_limit import limiter
 from app.core.security import create_access_token, verify_password
 from app.crud.user import user_crud
 from app.models.user import ROLE_USER
@@ -16,7 +20,10 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 @router.post("/login", response_model=AuthResponse)
-def login(payload: LoginRequest, response: Response, db: DbSession) -> AuthResponse:
+@limiter.limit(settings.login_rate_limit)
+def login(
+    request: Request, payload: LoginRequest, response: Response, db: DbSession
+) -> AuthResponse:
     user = user_crud.get_by_email(db, payload.email)
     if user is None or not verify_password(payload.password, user.hashed_password):
         raise HTTPException(
@@ -32,7 +39,10 @@ def login(payload: LoginRequest, response: Response, db: DbSession) -> AuthRespo
 
 
 @router.post("/register", response_model=AuthResponse, status_code=status.HTTP_201_CREATED)
-def register(payload: RegisterRequest, response: Response, db: DbSession) -> AuthResponse:
+@limiter.limit(settings.login_rate_limit)
+def register(
+    request: Request, payload: RegisterRequest, response: Response, db: DbSession
+) -> AuthResponse:
     if not settings.enable_user_auth:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -53,7 +63,7 @@ def register(payload: RegisterRequest, response: Response, db: DbSession) -> Aut
     return AuthResponse(user=UserRead.model_validate(user))
 
 
-@router.post("/logout", response_model=Message)
+@router.post("/logout", response_model=Message, dependencies=[Depends(require_csrf)])
 def logout(response: Response) -> Message:
     clear_auth_cookie(response)
     return Message(detail="Logged out")

@@ -13,6 +13,25 @@ import type {
 
 const CLIENT_BASE = env.apiBaseUrl.replace(/\/$/, "");
 
+const CSRF_COOKIE = "gv_csrf";
+const CSRF_HEADER = "x-csrf-token";
+const SAFE_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
+
+/** Read the double-submit CSRF token from its (non-httpOnly) cookie. */
+function csrfToken(): string | null {
+  if (typeof document === "undefined") return null;
+  const match = document.cookie.match(new RegExp(`(?:^|;\\s*)${CSRF_COOKIE}=([^;]+)`));
+  const value = match?.[1];
+  return value ? decodeURIComponent(value) : null;
+}
+
+/** CSRF header for state-changing requests, or an empty object for safe ones. */
+function csrfHeaders(method: string): Record<string, string> {
+  if (SAFE_METHODS.has(method.toUpperCase())) return {};
+  const token = csrfToken();
+  return token ? { [CSRF_HEADER]: token } : {};
+}
+
 export class ApiError extends Error {
   readonly status: number;
 
@@ -37,12 +56,14 @@ function extractDetail(body: unknown, fallback: string): string {
 }
 
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
+  const method = init.method ?? "GET";
   const res = await fetch(`${CLIENT_BASE}${path}`, {
     credentials: "include",
     ...init,
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
+      ...csrfHeaders(method),
       ...(init.headers ?? {}),
     },
   });
@@ -191,7 +212,7 @@ export async function uploadImage(file: File): Promise<UploadResult> {
     method: "POST",
     credentials: "include",
     body: form,
-    headers: { Accept: "application/json" },
+    headers: { Accept: "application/json", ...csrfHeaders("POST") },
   });
   const body: unknown = await res.json().catch(() => null);
   if (!res.ok) {

@@ -6,6 +6,15 @@ from functools import lru_cache
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+# Placeholder secrets that must never reach production.
+_INSECURE_SECRETS = {
+    "",
+    "changeme",
+    "change-me",
+    "insecure-development-secret-change-me",
+    "replace-me-with-a-long-random-secret",
+}
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
@@ -83,6 +92,19 @@ class Settings(BaseSettings):
     @property
     def max_upload_bytes(self) -> int:
         return self.max_upload_mb * 1024 * 1024
+
+    @property
+    def uses_insecure_secret(self) -> bool:
+        """True when SECRET_KEY is a known placeholder or too short to be safe."""
+        return self.secret_key in _INSECURE_SECRETS or len(self.secret_key) < 32
+
+    def enforce_production_secrets(self) -> None:
+        """Fail fast if production is configured with an insecure secret."""
+        if self.is_production and self.uses_insecure_secret:
+            raise RuntimeError(
+                "SECRET_KEY must be a long, random value in production. "
+                'Generate one with: python -c "import secrets; print(secrets.token_urlsafe(64))"'
+            )
 
 
 @lru_cache
