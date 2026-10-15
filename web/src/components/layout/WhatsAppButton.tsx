@@ -8,7 +8,7 @@ type WhatsAppButtonProps = {
 };
 
 export function WhatsAppButton({ settings, label }: WhatsAppButtonProps) {
-  const number = (settings?.whatsapp_number || "923000000000").replace(/[^\d]/g, "");
+  const number = (settings?.whatsapp_number || "923365447805").replace(/[^\d]/g, "");
   const href = `https://wa.me/${number}?text=${encodeURIComponent(
     `Hello ${SITE.shortName}, I would like to know more about your products and services.`,
   )}`;

@@ -7,9 +7,9 @@ export const SITE = {
   tagline: "Power Up Your Life",
   legalName: "GreenVolt Electronics",
   email: "info@greenvolt.example",
-  phoneDisplay: "+92 300 0000000",
-  phoneHref: "tel:+923000000000",
-  whatsappDisplay: "+92 300 0000000",
+  phoneDisplay: "+92 336 5447805",
+  phoneHref: "tel:+923365447805",
+  whatsappDisplay: "+92 336 5447805",
   address: {
     street: "Shop 12, Electronics Market",
     locality: "Saddar",

@@ -424,8 +424,8 @@ def _seed_testimonials(db: Session) -> None:
 def _seed_settings(db: Session) -> None:
     defaults = {
         "contact_email": settings.mail_owner,
-        "contact_phone": "+92 300 0000000",
-        "whatsapp_number": "923000000000",
+        "contact_phone": "+92 336 5447805",
+        "whatsapp_number": "923365447805",
         "address_street": "Shop 12, Electronics Market, Saddar",
         "address_city": "Karachi",
         "google_maps_embed_url": "",
