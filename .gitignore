@@ -35,6 +35,11 @@ htmlcov/
 api/media/uploads/
 !api/media/.gitkeep
 
+# ---- Local databases ----
+*.db
+*.sqlite
+*.sqlite3
+
 # ---- Logs / misc ----
 *.log
 npm-debug.log*
