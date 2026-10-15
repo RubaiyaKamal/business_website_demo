@@ -1,0 +1,42 @@
+# ---- OS / editors ----
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# ---- Env / secrets ----
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# ---- Node / Next.js ----
+node_modules/
+web/.next/
+web/out/
+web/coverage/
+web/.turbo/
+*.tsbuildinfo
+web/next-env.d.ts
+
+# ---- Python / FastAPI ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+api/media/uploads/
+!api/media/.gitkeep
+
+# ---- Logs / misc ----
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-error.log*

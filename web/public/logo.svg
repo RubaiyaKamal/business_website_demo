@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="40" viewBox="0 0 160 40" role="img" aria-label="GreenVolt Electronics">
+  <rect x="2" y="2" width="36" height="36" rx="11" fill="#1E8E3E"/>
+  <path d="M22.4 8.5 15.2 20.2h5.1l-1.6 11.3 8.4-13.3h-5.4z" fill="#FF8A00"/>
+  <text x="46" y="26" font-family="Inter, system-ui, sans-serif" font-size="19" font-weight="700" fill="#0B3D2E">Green<tspan fill="#1E8E3E">Volt</tspan></text>
+</svg>

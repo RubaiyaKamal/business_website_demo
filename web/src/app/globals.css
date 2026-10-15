@@ -1,0 +1,128 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-primary: #1e8e3e;
+    --color-dark: #0b3d2e;
+    --color-accent: #ff8a00;
+    --color-surface: #f4faf6;
+    --color-ink: #1a1a1a;
+  }
+
+  * {
+    @apply border-slate-200;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-surface text-ink antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-bold tracking-tight text-dark;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-accent ring-offset-2 ring-offset-white;
+  }
+
+  [dir="rtl"] body {
+    @apply font-urdu;
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-content px-4 sm:px-6 lg:px-8;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .btn-accent {
+    @apply btn bg-accent text-ink hover:bg-accent-600;
+  }
+
+  .btn-primary {
+    @apply btn bg-primary text-white hover:bg-primary-700;
+  }
+
+  .btn-outline {
+    @apply btn border border-primary text-primary hover:bg-primary-50;
+  }
+
+  .btn-ghost {
+    @apply btn text-dark hover:bg-primary-50;
+  }
+
+  .card {
+    @apply rounded-2xl bg-white shadow-card;
+  }
+
+  .input {
+    @apply w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-ink placeholder:text-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20;
+  }
+
+  .label {
+    @apply mb-1.5 block text-sm font-medium text-dark;
+  }
+
+  .badge {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold;
+  }
+
+  .badge-sale {
+    @apply badge bg-accent text-ink;
+  }
+
+  .prose-content {
+    @apply text-[15px] leading-7 text-slate-700;
+  }
+
+  .prose-content h2 {
+    @apply mt-8 mb-3 text-2xl;
+  }
+
+  .prose-content h3 {
+    @apply mt-6 mb-2 text-xl;
+  }
+
+  .prose-content p {
+    @apply mb-4;
+  }
+
+  .prose-content ul {
+    @apply mb-4 list-disc space-y-1 ps-6;
+  }
+
+  .prose-content ol {
+    @apply mb-4 list-decimal space-y-1 ps-6;
+  }
+
+  .prose-content a {
+    @apply text-primary underline underline-offset-2 hover:text-primary-700;
+  }
+
+  .prose-content blockquote {
+    @apply my-4 border-s-4 border-primary/40 bg-primary-50 px-4 py-2 italic;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .skip-link {
+    @apply sr-only focus:not-sr-only focus:absolute focus:start-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-dark focus:px-4 focus:py-2 focus:text-white;
+  }
+}
