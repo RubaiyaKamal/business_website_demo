@@ -13,6 +13,7 @@ from app.api.v1.endpoints import (
     services,
     settings,
     testimonials,
+    uploads,
 )
 
 api_router = APIRouter()
@@ -40,3 +41,4 @@ api_router.include_router(blog.admin_router)
 api_router.include_router(testimonials.admin_router)
 api_router.include_router(inquiries.admin_router)
 api_router.include_router(settings.admin_router)
+api_router.include_router(uploads.router)

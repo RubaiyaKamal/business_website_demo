@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app import __version__
 from app.api.v1.router import api_router
@@ -32,6 +35,11 @@ def create_app() -> FastAPI:
         return {"status": "ok", "service": "greenvolt-api", "version": __version__}
 
     app.include_router(api_router, prefix=settings.api_v1_prefix)
+
+    # Serve uploaded media read-only at /media (files live under media/uploads).
+    media_root = Path(settings.media_root)
+    media_root.mkdir(parents=True, exist_ok=True)
+    app.mount("/media", StaticFiles(directory=media_root.parent), name="media")
 
     return app
 

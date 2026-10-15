@@ -13,11 +13,16 @@ const nextConfig = {
   },
   async rewrites() {
     // Proxy the FastAPI backend under the web origin so JWT cookies, CSRF and
-    // CORS all behave as same-origin from the browser's perspective.
+    // CORS all behave as same-origin from the browser's perspective. Uploaded
+    // media is served from the same backend.
     return [
       {
         source: "/api/v1/:path*",
         destination: `${API_PROXY_TARGET}/api/v1/:path*`,
+      },
+      {
+        source: "/media/:path*",
+        destination: `${API_PROXY_TARGET}/media/:path*`,
       },
     ];
   },

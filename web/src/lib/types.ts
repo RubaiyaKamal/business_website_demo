@@ -128,3 +128,38 @@ export type User = {
 export type AuthResponse = {
   user: User;
 };
+
+export type InquiryStatus = "new" | "read" | "replied";
+
+export type InquiryRead = {
+  id: number;
+  name: string;
+  email: string;
+  phone: string | null;
+  subject: string;
+  message: string;
+  service_id: number | null;
+  status: InquiryStatus;
+  source: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export type DashboardStats = {
+  services: number;
+  projects: number;
+  blog_posts: number;
+  testimonials: number;
+  inquiries_total: number;
+  inquiries_new: number;
+  recent_inquiries: InquiryRead[];
+};
+
+export type UploadResult = {
+  url: string;
+  filename: string;
+  size: number;
+  content_type: string;
+};
+
+export type ResourceRecord = Record<string, unknown> & { id: number };

@@ -35,6 +35,16 @@ type IconName =
   | "facebook"
   | "instagram"
   | "tiktok"
+  | "layout"
+  | "briefcase"
+  | "newspaper"
+  | "settings"
+  | "plus"
+  | "trash"
+  | "pencil"
+  | "inbox"
+  | "chart"
+  | "external-link"
   | "bolt";
 
 const paths: Record<IconName, React.ReactNode> = {
@@ -186,6 +196,62 @@ const paths: Record<IconName, React.ReactNode> = {
     <path d="M15 3v9.5a3.5 3.5 0 1 1-3-3.46V12a1.5 1.5 0 1 0 1 1.41V3h2c.5 2 2 3.5 4 3.5v2c-1.4 0-2.7-.5-3.7-1.3" />
   ),
   bolt: <path d="M13 2 4 14h7l-1 8 9-12h-7z" />,
+  layout: (
+    <>
+      <rect x="3" y="3" width="18" height="18" rx="2" />
+      <path d="M3 9h18M9 21V9" />
+    </>
+  ),
+  briefcase: (
+    <>
+      <rect x="3" y="7" width="18" height="13" rx="2" />
+      <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18" />
+    </>
+  ),
+  newspaper: (
+    <>
+      <path d="M4 4h13v16H6a2 2 0 0 1-2-2z" />
+      <path d="M17 8h3v10a2 2 0 0 1-2 2h-1M7 8h6M7 12h6M7 16h6" />
+    </>
+  ),
+  settings: (
+    <>
+      <circle cx="12" cy="12" r="3" />
+      <path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" />
+    </>
+  ),
+  plus: <path d="M12 5v14M5 12h14" />,
+  trash: (
+    <>
+      <path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+      <path d="M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13" />
+    </>
+  ),
+  pencil: (
+    <>
+      <path d="M4 20h4L20 8l-4-4L4 16z" />
+      <path d="m14 6 4 4" />
+    </>
+  ),
+  inbox: (
+    <>
+      <path d="M3 12h5l1 3h6l1-3h5" />
+      <path d="M5 5h14l2 7v6a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-6z" />
+    </>
+  ),
+  chart: (
+    <>
+      <path d="M4 20V4M4 20h16" />
+      <path d="M8 16v-5M12 16V8M16 16v-3" />
+    </>
+  ),
+  "external-link": (
+    <>
+      <path d="M14 4h6v6" />
+      <path d="M20 4 11 13" />
+      <path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" />
+    </>
+  ),
 };
 
 type IconProps = SVGProps<SVGSVGElement> & {

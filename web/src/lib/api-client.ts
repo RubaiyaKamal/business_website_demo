@@ -1,8 +1,13 @@
 import { env } from "@/lib/env";
 import type {
   AuthResponse,
+  DashboardStats,
   InquiryCreate,
   InquiryCreated,
+  InquiryRead,
+  Page,
+  ResourceRecord,
+  UploadResult,
   User,
 } from "@/lib/types";
 
@@ -82,4 +87,115 @@ export function logout(): Promise<{ detail: string }> {
 
 export function getCurrentUser(): Promise<User> {
   return request<User>("/auth/me");
+}
+
+// --- Admin: dashboard & generic resource helpers ---------------------------
+
+export function getDashboardStats(): Promise<DashboardStats> {
+  return request<DashboardStats>("/admin/stats");
+}
+
+export function listResource(
+  endpoint: string,
+  params: Record<string, string | number | undefined> = {},
+): Promise<Page<ResourceRecord>> {
+  const search = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined && value !== "") search.set(key, String(value));
+  }
+  const query = search.toString();
+  return request<Page<ResourceRecord>>(`${endpoint}${query ? `?${query}` : ""}`);
+}
+
+export function createResource(
+  endpoint: string,
+  payload: Record<string, unknown>,
+): Promise<ResourceRecord> {
+  return request<ResourceRecord>(endpoint, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function updateResource(
+  endpoint: string,
+  id: number,
+  payload: Record<string, unknown>,
+): Promise<ResourceRecord> {
+  return request<ResourceRecord>(`${endpoint}/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function deleteResource(endpoint: string, id: number): Promise<void> {
+  return request<void>(`${endpoint}/${id}`, { method: "DELETE" });
+}
+
+export function setPublished(
+  endpoint: string,
+  id: number,
+  isPublished: boolean,
+): Promise<ResourceRecord> {
+  return request<ResourceRecord>(`${endpoint}/${id}/publish`, {
+    method: "PATCH",
+    body: JSON.stringify({ is_published: isPublished }),
+  });
+}
+
+// --- Admin: inquiries ------------------------------------------------------
+
+export function listInquiries(
+  params: { page?: number; page_size?: number; q?: string; status?: string } = {},
+): Promise<Page<InquiryRead>> {
+  const search = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined && value !== "") search.set(key, String(value));
+  }
+  const query = search.toString();
+  return request<Page<InquiryRead>>(`/admin/inquiries${query ? `?${query}` : ""}`);
+}
+
+export function updateInquiryStatus(id: number, status: string): Promise<InquiryRead> {
+  return request<InquiryRead>(`/admin/inquiries/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify({ status }),
+  });
+}
+
+export function deleteInquiry(id: number): Promise<void> {
+  return request<void>(`/admin/inquiries/${id}`, { method: "DELETE" });
+}
+
+// --- Admin: settings -------------------------------------------------------
+
+export function getAdminSettings(): Promise<Record<string, string>> {
+  return request<Record<string, string>>("/admin/settings");
+}
+
+export function saveAdminSettings(items: { key: string; value: string }[]): Promise<
+  Record<string, string>
+> {
+  return request<Record<string, string>>("/admin/settings", {
+    method: "PUT",
+    body: JSON.stringify({ items }),
+  });
+}
+
+// --- Admin: uploads --------------------------------------------------------
+
+export async function uploadImage(file: File): Promise<UploadResult> {
+  const form = new FormData();
+  form.append("file", file);
+  const res = await fetch(`${CLIENT_BASE}/admin/uploads`, {
+    method: "POST",
+    credentials: "include",
+    body: form,
+    headers: { Accept: "application/json" },
+  });
+  const body: unknown = await res.json().catch(() => null);
+  if (!res.ok) {
+    throw new ApiError(extractDetail(body, "Upload failed"), res.status);
+  }
+  return body as UploadResult;
 }
