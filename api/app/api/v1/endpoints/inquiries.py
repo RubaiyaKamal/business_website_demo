@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from fastapi import APIRouter, HTTPException, Query, Request, Response, status
+from fastapi import APIRouter, BackgroundTasks, HTTPException, Query, Request, Response, status
 
 from app.api.v1.utils import PageDep, total_pages
 from app.core.deps import AdminUser, DbSession, get_client_ip
@@ -18,6 +18,7 @@ from app.schemas.inquiry import (
     InquiryRead,
     InquiryStatusUpdate,
 )
+from app.services.email import notify_new_inquiry
 
 public_router = APIRouter(prefix="/inquiries", tags=["inquiries"])
 admin_router = APIRouter(prefix="/admin/inquiries", tags=["admin:inquiries"])
@@ -34,7 +35,13 @@ def _get_or_404(db: DbSession, inquiry_id: int) -> ContactMessage:
 
 
 @public_router.post("", response_model=InquiryCreated, status_code=status.HTTP_201_CREATED)
-def submit_inquiry(payload: InquiryCreate, request: Request, db: DbSession) -> InquiryCreated:
+def submit_inquiry(
+    payload: InquiryCreate,
+    request: Request,
+    db: DbSession,
+    background: BackgroundTasks,
+) -> InquiryCreated:
+    service_name: str | None = None
     if payload.service_id is not None:
         service = service_crud.get(db, payload.service_id)
         if service is None:
@@ -42,6 +49,7 @@ def submit_inquiry(payload: InquiryCreate, request: Request, db: DbSession) -> I
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                 detail="Selected service does not exist",
             )
+        service_name = service.title
     inquiry = inquiry_crud.create(
         db,
         {
@@ -50,6 +58,15 @@ def submit_inquiry(payload: InquiryCreate, request: Request, db: DbSession) -> I
             "source": "website",
             "ip_address": get_client_ip(request),
         },
+    )
+    background.add_task(
+        notify_new_inquiry,
+        name=payload.name,
+        email=payload.email,
+        phone=payload.phone,
+        subject=payload.subject,
+        message=payload.message,
+        service_name=service_name,
     )
     return InquiryCreated(detail="Your message has been received.", id=inquiry.id or 0)
 
