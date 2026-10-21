@@ -29,7 +29,6 @@ export function PostCard({ locale, post, minReadLabel }: PostCardProps) {
           ) : (
             <Icon name="sparkles" size={36} className="text-primary/40" />
           )}
-          <span className="badge-sale absolute start-4 top-4">{post.category}</span>
         </div>
       </Link>
       <div className="flex flex-1 flex-col p-6">
